@@ -1,3 +1,5 @@
+import os
+
 import discord
 from discord.ext import commands
 from db import insert_book, insert_user, insert_contributor, link_contributor_to_book, get_book_summaries
@@ -19,7 +21,7 @@ async def addbook(ctx, title: str, source: str, book_format: str, genre: str):
         discord_id=ctx.author.id,
         username=ctx.author.name,
         discriminator=ctx.author.discriminator,
-        nickname=ctx.author.nick
+        nickname = ctx.author.nick if ctx.author.nick else ctx.author.name
     )
 
     # Add book
@@ -34,7 +36,7 @@ async def listbooks(ctx):
         return
 
     message = "**Books in the Library:**\n"
-    for title, format, source, url, role, contributor in books:
+    for title, book_format, source, url, role, contributor in books:
         line = f"• *{title}* ({format}) by {contributor} [{role}]"
         if source:
             line += f" — Source: {source}"
@@ -43,3 +45,9 @@ async def listbooks(ctx):
         message += line + "\n"
 
     await ctx.send(message)
+
+@bot.command()
+async def ping(ctx):
+    await ctx.send("Pong!")
+
+bot.run(os.getenv("DISCORD_TOKEN"))
