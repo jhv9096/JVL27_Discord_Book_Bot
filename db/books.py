@@ -15,14 +15,33 @@ def get_book_summaries():
     conn = get_connection()
     cur = conn.cursor()
     cur.execute("""
-        SELECT b.title, b.format, b.source, b.url, bc.role, c.name
+        SELECT 
+            b.id,
+            b.title,
+            b.format,
+            b.source,
+            b.has_contributors,
+            bc.role,
+            c.name
         FROM books b
         LEFT JOIN book_credits bc ON b.id = bc.book_id
         LEFT JOIN contributors c ON bc.contributor_id = c.id
-        WHERE bc.role IN ('Author', 'Writer', 'Publisher')
         ORDER BY b.added_at DESC;
     """)
     results = cur.fetchall()
     cur.close()
     conn.close()
     return results
+
+def get_all_books():
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT title, format, source
+        FROM books
+        ORDER BY added_at DESC;
+    """)
+    books = cur.fetchall()
+    cur.close()
+    conn.close()
+    return books
