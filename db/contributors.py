@@ -20,3 +20,12 @@ def link_contributor_to_book(book_id, contributor_id, role):
     conn.commit()
     cur.close()
     conn.close()
+
+def get_contributor_id_by_name(name):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT id FROM contributors WHERE name = %s", (name,))
+    result = cur.fetchone()
+    cur.close()
+    conn.close()
+    return result[0] if result else None

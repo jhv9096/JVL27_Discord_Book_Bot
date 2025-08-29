@@ -1,9 +1,13 @@
 import os
+from collections import defaultdict
 
 import discord
 from discord.ext import commands
-from db import insert_book, insert_user, insert_contributor, link_contributor_to_book, get_book_summaries, get_all_books
-from collections import defaultdict
+from sqlalchemy.dialects.postgresql import psycopg2
+import psycopg2.errors
+
+from db import insert_book, insert_user, insert_contributor, link_contributor_to_book, get_book_summaries, \
+    get_all_books, get_contributor_id_by_name, book_exists
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -42,7 +46,7 @@ async def listbooks(ctx):
     await ctx.send(message)
 
 @bot.command()
-async def listbook_summaries(ctx):
+async def listbooksplus(ctx):
     rows = get_book_summaries()  # Returns list of tuples from the query above
 
     if not rows:
@@ -51,15 +55,15 @@ async def listbook_summaries(ctx):
 
     book_map = defaultdict(list)
 
-    for book_id, title, book_format, source, has_contributors, contributor, role in rows:
-        book_map[book_id].append((title, book_format, source, has_contributors, contributor, role))
+    for book_id, title, book_format, source, has_contributors, role, contributor in rows:
+        book_map[book_id].append((title, book_format, source, has_contributors, role, contributor))
 
-    message = "**Book Summaries:**\n"
+    message = "**Books in the Library:**\n"
     for entries in book_map.values():
         title, book_format, source, has_contributors, _, _ = entries[0]
         contributor_lines = []
 
-        for _, _, _, _, contributor, role in entries:
+        for _, _, _, _, role, contributor in entries:
             if contributor:
                 contributor_lines.append(f"{contributor} [{role}]")
 
@@ -68,6 +72,22 @@ async def listbook_summaries(ctx):
         message += f"• *{title}* ({book_format}) — Source: {source}\n   Contributors: {contributor_display}\n\n"
 
     await ctx.send(message)
+
+@bot.command()
+async def addcontributor(ctx, book_id: int, name: str, role: str):
+    if not book_exists(book_id):
+        await ctx.send(f"❌ Book ID {book_id} does not exist.")
+        return
+
+    contributor_id = get_contributor_id_by_name(name)
+    if not contributor_id:
+        contributor_id = insert_contributor(name)
+
+    try:
+        link_contributor_to_book(book_id, contributor_id, role)
+        await ctx.send(f"✅ Contributor '{name}' added to book ID {book_id} as [{role}].")
+    except psycopg2.errors.UniqueViolation:
+        await ctx.send(f"⚠️ Contributor '{name}' already linked to book ID {book_id} with role [{role}].")
 
 @bot.command()
 async def ping(ctx):

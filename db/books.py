@@ -45,3 +45,12 @@ def get_all_books():
     cur.close()
     conn.close()
     return books
+
+def book_exists(book_id):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT 1 FROM books WHERE id = %s", (book_id,))
+    exists = cur.fetchone() is not None
+    cur.close()
+    conn.close()
+    return exists
