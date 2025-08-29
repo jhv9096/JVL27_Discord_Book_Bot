@@ -37,7 +37,7 @@ async def listbooks(ctx):
 
     message = "**Books in the Library:**\n"
     for title, book_format, source, url, role, contributor in books:
-        line = f"• *{title}* ({format}) by {contributor} [{role}]"
+        line = f"• *{title}* ({book_format}) by {contributor} [{role}]"
         if source:
             line += f" — Source: {source}"
         if url:

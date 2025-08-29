@@ -14,7 +14,7 @@ def link_contributor_to_book(book_id, contributor_id, role):
     conn = get_connection()
     cur = conn.cursor()
     cur.execute("""
-        INSERT INTO book_contributors (book_id, contributor_id, role)
+        INSERT INTO book_credits (book_id, contributor_id, role)
         VALUES (%s, %s, %s)
     """, (book_id, contributor_id, role))
     conn.commit()

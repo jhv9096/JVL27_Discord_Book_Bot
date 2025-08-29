@@ -17,7 +17,7 @@ def get_book_summaries():
     cur.execute("""
         SELECT b.title, b.format, b.source, b.url, bc.role, c.name
         FROM books b
-        LEFT JOIN book_contributors bc ON b.id = bc.book_id
+        LEFT JOIN book_credits bc ON b.id = bc.book_id
         LEFT JOIN contributors c ON bc.contributor_id = c.id
         WHERE bc.role IN ('Author', 'Writer', 'Publisher')
         ORDER BY b.added_at DESC;
