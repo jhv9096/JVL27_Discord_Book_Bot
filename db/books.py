@@ -54,3 +54,12 @@ def book_exists(book_id):
     cur.close()
     conn.close()
     return exists
+
+def get_book_id_by_title(title):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT id FROM books WHERE title = %s", (title,))
+    result = cur.fetchone()
+    cur.close()
+    conn.close()
+    return result[0] if result else None

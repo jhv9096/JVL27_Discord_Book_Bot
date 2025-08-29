@@ -7,7 +7,7 @@ from sqlalchemy.dialects.postgresql import psycopg2
 import psycopg2.errors
 
 from db import insert_book, insert_user, insert_contributor, link_contributor_to_book, get_book_summaries, \
-    get_all_books, get_contributor_id_by_name, book_exists
+    get_all_books, get_contributor_id_by_name, book_exists, get_book_id_by_title
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -74,9 +74,10 @@ async def listbooksplus(ctx):
     await ctx.send(message)
 
 @bot.command()
-async def addcontributor(ctx, book_id: int, name: str, role: str):
-    if not book_exists(book_id):
-        await ctx.send(f"❌ Book ID {book_id} does not exist.")
+async def addcontributor(ctx, title: str, name: str, role: str):
+    book_id = get_book_id_by_title(title)
+    if not book_id:
+        await ctx.send(f"❌ Book titled '{title}' not found in the database.")
         return
 
     contributor_id = get_contributor_id_by_name(name)
@@ -85,9 +86,10 @@ async def addcontributor(ctx, book_id: int, name: str, role: str):
 
     try:
         link_contributor_to_book(book_id, contributor_id, role)
-        await ctx.send(f"✅ Contributor '{name}' added to book ID {book_id} as [{role}].")
+        await ctx.send(f"✅ Contributor '{name}' added to *{title}* as [{role}].")
     except psycopg2.errors.UniqueViolation:
-        await ctx.send(f"⚠️ Contributor '{name}' already linked to book ID {book_id} with role [{role}].")
+        await ctx.send(f"⚠️ Contributor '{name}' is already linked to *{title}* with role [{role}].")
+
 
 @bot.command()
 async def ping(ctx):
