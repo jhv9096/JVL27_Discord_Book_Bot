@@ -4,6 +4,7 @@ import os
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
+import asyncio
 
 load_dotenv()
 
@@ -26,5 +27,7 @@ async def main():
     await load_cogs()
     await bot.start(os.getenv("DISCORD_TOKEN"))
 
-import asyncio
-asyncio.run(main())
+try:
+    asyncio.run(main())
+except KeyboardInterrupt:
+    print("\n🛑 Shutdown requested. BookBot shutting down.")
