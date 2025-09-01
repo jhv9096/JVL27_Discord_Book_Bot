@@ -1,0 +1,10 @@
+Discord Bot Roadmap:
+
+Core Features:
+Add books of various formats to a database.
+Add all contributors (author, writer, penciller, etc.) to a book.
+Track all Discord users requesting changes.
+List all books by title.
+List all books with minimal identifying information beyond just the title.
+Remove a book from the database
+Edit existing information related to a book in the database.
