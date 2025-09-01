@@ -24,3 +24,6 @@ class Contributors(commands.Cog):
             await ctx.send(f"✅ Contributor '{name}' added to *{title}* as [{role}].")
         except psycopg2.errors.UniqueViolation:
             await ctx.send(f"⚠️ Contributor '{name}' is already linked to *{title}* with role [{role}].")
+
+async def setup(bot):
+    await bot.add_cog(Contributors(bot))
