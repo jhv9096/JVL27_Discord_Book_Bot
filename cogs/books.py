@@ -4,7 +4,7 @@ from discord.ext import commands
 
 from db import insert_book, get_all_books, get_book_summaries
 
-
+print("Books cog loaded")
 class Books(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -22,6 +22,7 @@ class Books(commands.Cog):
     @commands.command()
     async def listbooks(self, ctx):
         books = get_all_books()
+        print("DEBUG: books =", books)
         if not books:
             await ctx.send("📚 No books found in the library.")
             return
