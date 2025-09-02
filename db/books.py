@@ -44,3 +44,14 @@ def get_book_id_by_title(title):
         cur.execute("SELECT id FROM books WHERE title = %s", (title,))
         result = cur.fetchone()
         return result[0] if result else None
+
+def update_book_field(book_id, field, value):
+    allowed_fields = {"title", "source", "format", "genre", "tags", "summary", "url"}
+    if field not in allowed_fields:
+        raise ValueError(f"Field '{field}' is not editable.")
+
+    with db_cursor() as cur:
+        if field == "tags":
+            cur.execute("UPDATE books SET tags = %s WHERE id = %s", ([value], book_id))
+        else:
+            cur.execute(f"UPDATE books SET {field} = %s WHERE id = %s", (value, book_id))

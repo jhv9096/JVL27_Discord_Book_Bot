@@ -2,7 +2,7 @@
 
 from discord.ext import commands
 
-from db import insert_book, get_all_books, get_book_summaries
+from db import insert_book, get_all_books, get_book_summaries, update_book_field, get_book_id_by_title
 
 print("Books cog loaded")
 class Books(commands.Cog):
@@ -55,6 +55,22 @@ class Books(commands.Cog):
             message += f"• *{title}* ({book_format}) — Source: {source}\n   Contributors: {contributor_display}\n\n"
 
         await ctx.send(message)
+
+    @commands.command()
+    async def editbook(self, ctx, old_title: str, field: str, *, new_value: str):
+        book_id = get_book_id_by_title(old_title)
+        if not book_id:
+            await ctx.send(f"❌ Book titled '{old_title}' not found.")
+            return
+
+        try:
+            update_book_field(book_id, field.lower(), new_value)
+            await ctx.send(f"✅ Updated *{old_title}*: `{field}` is now '{new_value}'.")
+        except ValueError as ve:
+            await ctx.send(f"⚠️ {ve}")
+        except Exception as e:
+            await ctx.send(f"❌ Failed to update book: {e}")
+
 
 async def setup(bot):
     await bot.add_cog(Books(bot))
